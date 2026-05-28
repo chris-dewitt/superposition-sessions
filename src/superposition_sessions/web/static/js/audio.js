@@ -7,12 +7,14 @@ class SineSuperpositionEngine {
     this.master = null;
     this.reverbSend = null;
     this.layers = new Map();
+    this.layerBuses = new Map();
     this.playing = false;
+    this.collapsed = false;
+    this.collapsedWinner = null;
     this.startTime = 0;
     this.scheduledUntil = 0;
     this.scheduleTimer = null;
     this.soloLayer = null;
-    this.layerGains = new Map();
   }
 
   async ensureContext() {
@@ -47,11 +49,27 @@ class SineSuperpositionEngine {
     this.reverbSend.buffer = impulse;
   }
 
+  _ensureLayerBus(layerId) {
+    if (!this.layerBuses.has(layerId)) {
+      const bus = this.ctx.createGain();
+      bus.gain.value = 1;
+      bus.connect(this.master);
+      const revSend = this.ctx.createGain();
+      revSend.gain.value = 0.35;
+      bus.connect(revSend);
+      revSend.connect(this.reverbSend);
+      this.layerBuses.set(layerId, bus);
+    }
+    return this.layerBuses.get(layerId);
+  }
+
   setSession(sessionData) {
-    this.stop();
+    this.hardStop();
     this.layers.clear();
-    this.layerGains.clear();
+    this.layerBuses.clear();
     this.soloLayer = null;
+    this.collapsed = false;
+    this.collapsedWinner = null;
 
     for (const layer of sessionData.layers) {
       this.layers.set(layer.layer_id, layer);
@@ -62,12 +80,27 @@ class SineSuperpositionEngine {
     return Math.pow(2, cents / 1200);
   }
 
+  _activeLayers() {
+    if (this.collapsed && this.collapsedWinner) {
+      return [this.collapsedWinner];
+    }
+    return [...this.layers.keys()];
+  }
+
+  _layerVolume(layerId) {
+    if (this.collapsed) return layerId === this.collapsedWinner ? 1 : 0;
+    if (this.soloLayer && this.soloLayer !== layerId) return 0.08;
+    return 1;
+  }
+
   _scheduleLayer(layerId, windowStart, windowEnd) {
     const layer = this.layers.get(layerId);
     if (!layer) return;
 
+    const bus = this._ensureLayerBus(layerId);
     const loopDuration = layer.loop_duration;
     const detune = this._centsRatio(layer.detune_cents || 0);
+    const vol = this._layerVolume(layerId);
 
     let t = windowStart;
     while (t < windowEnd) {
@@ -82,18 +115,13 @@ class SineSuperpositionEngine {
         osc.frequency.value = event.freq * detune;
 
         const gain = this.ctx.createGain();
-        const peak = event.gain * (this.soloLayer && this.soloLayer !== layerId ? 0.08 : 1);
+        const peak = event.gain * vol;
         gain.gain.setValueAtTime(0.0001, noteStart);
         gain.gain.exponentialRampToValueAtTime(Math.max(peak, 0.0002), noteStart + 0.04);
         gain.gain.exponentialRampToValueAtTime(0.0001, noteEnd);
 
         osc.connect(gain);
-        gain.connect(this.master);
-
-        const rev = this.ctx.createGain();
-        rev.gain.value = 0.35;
-        gain.connect(rev);
-        rev.connect(this.reverbSend);
+        gain.connect(bus);
 
         osc.start(noteStart);
         osc.stop(noteEnd + 0.02);
@@ -109,7 +137,7 @@ class SineSuperpositionEngine {
     const horizon = now + 2.5;
     if (this.scheduledUntil < horizon) {
       const from = Math.max(this.scheduledUntil, now);
-      for (const layerId of this.layers.keys()) {
+      for (const layerId of this._activeLayers()) {
         this._scheduleLayer(layerId, from - this.startTime, horizon - this.startTime);
       }
       this.scheduledUntil = horizon;
@@ -121,14 +149,18 @@ class SineSuperpositionEngine {
     if (this.playing) return;
 
     this.playing = true;
-    this.startTime = this.ctx.currentTime;
-    this.scheduledUntil = this.startTime;
+    if (!this.startTime) {
+      this.startTime = this.ctx.currentTime;
+      this.scheduledUntil = this.startTime;
+    }
     this._tickSchedule();
     this.scheduleTimer = setInterval(() => this._tickSchedule(), 400);
   }
 
-  stop() {
+  hardStop() {
     this.playing = false;
+    this.startTime = 0;
+    this.scheduledUntil = 0;
     if (this.scheduleTimer) {
       clearInterval(this.scheduleTimer);
       this.scheduleTimer = null;
@@ -138,15 +170,75 @@ class SineSuperpositionEngine {
       this.ctx = null;
       this.master = null;
       this.reverbSend = null;
+      this.layerBuses.clear();
+    }
+  }
+
+  stopListening() {
+    this.playing = false;
+    if (this.scheduleTimer) {
+      clearInterval(this.scheduleTimer);
+      this.scheduleTimer = null;
     }
   }
 
   setSolo(layerId) {
+    if (this.collapsed) return;
     if (this.soloLayer === layerId) {
       this.soloLayer = null;
     } else {
       this.soloLayer = layerId;
     }
+  }
+
+  async collapse(winnerId) {
+    await this.ensureContext();
+    if (!this.playing) await this.play();
+
+    const now = this.ctx.currentTime;
+    const silenceEnd = now + 0.4;
+    const fadeEnd = silenceEnd + 1.2;
+
+    // silence gap
+    this.master.gain.cancelScheduledValues(now);
+    this.master.gain.setValueAtTime(this.master.gain.value, now);
+    this.master.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+    this.master.gain.setValueAtTime(0.0001, silenceEnd);
+    this.master.gain.exponentialRampToValueAtTime(0.85, silenceEnd + 0.15);
+
+    // high-pass sweep on collapse
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = "highpass";
+    filter.frequency.setValueAtTime(200, now);
+    filter.frequency.exponentialRampToValueAtTime(8000, silenceEnd);
+    this.master.disconnect();
+    this.master.connect(filter);
+    filter.connect(this.ctx.destination);
+    setTimeout(() => {
+      try {
+        filter.disconnect();
+        this.master.disconnect();
+        this.master.connect(this.ctx.destination);
+      } catch (_) {}
+    }, 1600);
+
+    // fade losers
+    for (const [layerId, bus] of this.layerBuses.entries()) {
+      bus.gain.cancelScheduledValues(now);
+      bus.gain.setValueAtTime(bus.gain.value, now);
+      if (layerId === winnerId) {
+        bus.gain.setValueAtTime(1, silenceEnd);
+      } else {
+        bus.gain.exponentialRampToValueAtTime(0.0001, fadeEnd);
+      }
+    }
+
+    await new Promise((r) => setTimeout(r, 1600));
+
+    this.collapsed = true;
+    this.collapsedWinner = winnerId;
+    this.soloLayer = null;
+    this.scheduledUntil = this.ctx.currentTime;
   }
 }
 

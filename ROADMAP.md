@@ -10,27 +10,24 @@ Grow over weeks. Each week ships something you can *feel*, not just check off.
 
 | Task | Done when |
 |------|-----------|
-| Qiskit circuit → musical parameters (scale, tempo, note density) | ✓ `quantum/seed.py` |
-| Sine-wave loop generator from seed | ✓ Web Audio, 8-bar loops per layer |
-| Basic FastAPI server serves a dark single-page UI | ✓ void, orbs, listen/stop |
-| Web Audio playback of 3 layers | ✓ simultaneous detuned sine waves |
-| `README` quick start works on fresh clone | ✓ |
-
-**Not in scope:** LLM, collapse, save. Just superposition you can hear.
+| Qiskit circuit → musical parameters | ✓ `quantum/seed.py` |
+| Sine-wave loops from seed | ✓ Web Audio, 8-bar layers |
+| Custom art-forward FastAPI UI | ✓ void, orbs, listen |
+| Three simultaneous detuned layers | ✓ |
 
 ---
 
-## Week 2 — *Measure*
+## Week 2 — *Measure* ✓
 
 **Goal:** Collapse superposition into one saved session. It feels like an event.
 
 | Task | Done when |
 |------|-----------|
-| Collapse mechanic (pick or random weighted by amplitude) | One layer survives, others fade |
-| Amber collapse animation + audio crossfade | Matches DESIGN.md timing |
-| Ollama integration — vignette on collapse | Title appears after measure |
-| Save to `sessions/` (JSON metadata + MIDI + vignette text) | Folder grows like a diary |
-| Session gallery — browse collapsed past | Minimal list, poetic timestamps |
+| Collapse mechanic (quantum measurement + amplitude weighting) | ✓ `quantum/collapse.py` |
+| Amber collapse animation + audio crossfade | ✓ 400ms silence + 1.2s fade |
+| Ollama integration — vignette on collapse | ✓ with curated fallbacks |
+| Save to `sessions/` (JSON + layer events + vignette) | ✓ `sessions/store.py` |
+| Session gallery — browse collapsed past | ✓ collapsed canon panel |
 
 ---
 

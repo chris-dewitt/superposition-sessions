@@ -64,9 +64,18 @@ copy .env.example .env
 python -m superposition_sessions
 ```
 
-Open **http://127.0.0.1:7841** — click **listen**, hover orbs to solo a voice, open another session when the room gets too quiet.
+Open **http://127.0.0.1:7841** — click **listen**, hover orbs to solo a voice, hit **◈ measure** to collapse, browse **collapsed canon**.
 
-**Week 1 ships:** real Qiskit seeds → three sine-wave layers in superposition via Web Audio.
+**Week 2 ships:** quantum collapse, amber ritual, Ollama vignettes (with fallbacks), saved sessions.
+
+### Ollama (optional but recommended)
+
+```bash
+ollama pull llama3.2
+ollama serve
+```
+
+If Ollama isn't running, curated fallback vignettes still appear — the room never goes truly silent.
 
 ---
 

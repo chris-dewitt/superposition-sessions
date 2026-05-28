@@ -12,11 +12,22 @@
 <body>
   <div class="grain" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
+  <div class="collapse-flash is-hidden" id="collapse-flash" aria-hidden="true"></div>
+
+  <aside class="canon is-hidden" id="canon" aria-label="Collapsed sessions">
+    <div class="canon-header">
+      <h2 class="canon-title">collapsed canon</h2>
+      <button class="btn btn-ghost canon-close" id="canon-close" type="button">close</button>
+    </div>
+    <ul class="canon-list" id="canon-list"></ul>
+    <p class="canon-empty is-hidden" id="canon-empty">no measurements yet. the diary is blank.</p>
+  </aside>
 
   <main class="room" id="room">
     <header class="header">
       <p class="eyebrow">superposition sessions</p>
       <h1 class="title">three voices, one truth</h1>
+      <button class="canon-toggle" id="canon-toggle" type="button">collapsed canon</button>
     </header>
 
     <section class="boot" id="boot" aria-live="polite">
@@ -40,12 +51,17 @@
         </button>
       </div>
 
-      <p class="vignette-placeholder" id="vignette-placeholder">
-        listen. all three exist until you measure.
-      </p>
+      <article class="vignette" id="vignette">
+        <p class="vignette-placeholder" id="vignette-placeholder">
+          listen. all three exist until you measure.
+        </p>
+        <h2 class="vignette-title is-hidden" id="vignette-title"></h2>
+        <p class="vignette-body is-hidden" id="vignette-body"></p>
+      </article>
 
       <div class="controls">
         <button class="btn btn-primary" id="play-btn" type="button">◌ listen</button>
+        <button class="btn btn-measure is-hidden" id="measure-btn" type="button">◈ measure</button>
         <button class="btn btn-ghost" id="new-btn" type="button">open another session</button>
       </div>
     </section>

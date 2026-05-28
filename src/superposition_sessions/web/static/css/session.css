@@ -72,6 +72,24 @@ body {
   margin-bottom: 3rem;
   opacity: 0;
   animation: fade-up 1.4s var(--ease) 0.2s forwards;
+  position: relative;
+}
+
+.canon-toggle {
+  margin-top: 1.25rem;
+  border: none;
+  background: transparent;
+  color: var(--ash);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  cursor: pointer;
+  transition: color 0.3s var(--ease);
+}
+
+.canon-toggle:hover {
+  color: var(--amber);
 }
 
 .eyebrow {
@@ -214,6 +232,30 @@ body {
   opacity: 0.88;
 }
 
+.vignette-title {
+  max-width: 42ch;
+  margin: 0 auto 1rem;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--amber);
+}
+
+.vignette-body {
+  max-width: 42ch;
+  margin: 0 auto 2.5rem;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  line-height: 1.75;
+  color: var(--bone);
+  opacity: 0.92;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
 .controls {
   display: flex;
   gap: 1rem;
@@ -253,6 +295,137 @@ body {
 .btn-ghost:hover {
   color: var(--bone);
   border-color: var(--ash);
+}
+
+.btn-measure {
+  border-color: rgba(255, 179, 71, 0.55);
+  color: var(--amber);
+}
+
+.btn-measure:hover:not(:disabled) {
+  background: rgba(255, 179, 71, 0.1);
+  border-color: var(--amber);
+}
+
+.btn-measure:disabled,
+.btn-measure.measured {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.orb.collapsed .orb-core {
+  background: radial-gradient(circle at 35% 35%, var(--amber), transparent 68%);
+  box-shadow:
+    0 0 40px rgba(255, 179, 71, 0.45),
+    inset 0 0 24px rgba(255, 179, 71, 0.2);
+  animation: none;
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.orb.decayed .orb-core {
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 1.2s var(--ease), transform 1.2s var(--ease);
+}
+
+.collapse-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 179, 71, 0.55), transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s linear;
+}
+
+.collapse-flash.active {
+  opacity: 1;
+}
+
+.canon {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(360px, 92vw);
+  height: 100%;
+  z-index: 150;
+  background: rgba(8, 8, 12, 0.96);
+  border-left: 1px solid rgba(255, 179, 71, 0.15);
+  padding: 1.5rem;
+  overflow-y: auto;
+  backdrop-filter: blur(8px);
+}
+
+.canon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.canon-title {
+  margin: 0;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--amber);
+}
+
+.canon-close {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.72rem;
+}
+
+.canon-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.canon-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(107, 114, 128, 0.2);
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 0.3s var(--ease);
+}
+
+.canon-item:hover {
+  opacity: 0.75;
+}
+
+.canon-item-time {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  color: var(--ash);
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+}
+
+.canon-item-title {
+  display: block;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 1.05rem;
+  color: var(--bone);
+  line-height: 1.4;
+  margin-bottom: 0.35rem;
+}
+
+.canon-item-meta {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  color: rgba(0, 255, 213, 0.55);
+}
+
+.canon-empty {
+  font-family: "Instrument Serif", Georgia, serif;
+  color: var(--ash);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: left;
 }
 
 .footer {

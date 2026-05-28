@@ -5,6 +5,7 @@ No clichés. No "in a world where". No explaining quantum physics.
 The user just collapsed a musical superposition — one song survived, others died.
 
 Quantum seed: {seed_hash}
+Surviving layer: {winner}
 Surviving layer mood: {mood}
 Lost layers: {lost_count}
 
