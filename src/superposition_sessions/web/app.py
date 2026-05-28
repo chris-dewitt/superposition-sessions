@@ -57,8 +57,9 @@ def _session_payload(session, layers_events: list[dict]) -> dict:
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request) -> HTMLResponse:
     return TEMPLATES.TemplateResponse(
+        request,
         "index.html",
-        {"request": request, "boot_ms": int(os.getenv("BOOT_MS", "900"))},
+        {"boot_ms": int(os.getenv("BOOT_MS", "900"))},
     )
 
 
