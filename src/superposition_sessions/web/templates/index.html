@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Superposition Sessions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/session.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <main class="room" id="room">
+    <header class="header">
+      <p class="eyebrow">superposition sessions</p>
+      <h1 class="title">three voices, one truth</h1>
+    </header>
+
+    <section class="boot" id="boot" aria-live="polite">
+      <p class="boot-text" id="boot-text">tuning qubits...</p>
+      <div class="boot-line"></div>
+    </section>
+
+    <section class="session hidden" id="session" aria-label="Active session">
+      <div class="orbs" id="orbs">
+        <button class="orb" data-layer="A" aria-label="Layer A">
+          <span class="orb-core"></span>
+          <span class="orb-label">A</span>
+        </button>
+        <button class="orb" data-layer="B" aria-label="Layer B">
+          <span class="orb-core"></span>
+          <span class="orb-label">B</span>
+        </button>
+        <button class="orb" data-layer="C" aria-label="Layer C">
+          <span class="orb-core"></span>
+          <span class="orb-label">C</span>
+        </button>
+      </div>
+
+      <p class="vignette-placeholder" id="vignette-placeholder">
+        listen. all three exist until you measure.
+      </p>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="play-btn" type="button">◌ listen</button>
+        <button class="btn btn-ghost" id="new-btn" type="button">open another session</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <code class="psi" id="psi-label">|ψ⟩ = …</code>
+      <span class="seed" id="seed-label">seed —</span>
+    </footer>
+  </main>
+
+  <script>
+    window.SESSION_BOOT_MS = {{ boot_ms }};
+  </script>
+  <script src="/static/js/audio.js"></script>
+  <script src="/static/js/session.js"></script>
+</body>
+</html>

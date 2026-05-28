@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Sessions (personal artifacts — opt-in to commit)
+sessions/*.mid
+sessions/*.wav
+sessions/*.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ollama / model caches
+*.gguf
+
+# Build
+dist/
+build/
+*.egg-info/
